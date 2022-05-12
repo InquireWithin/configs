@@ -1,0 +1,330 @@
+//rename to autoexec.cfg in the cfg folder
+//This is mainly a graphical script
+
+//null movement
+bind w +mfwd
+bind s +mback
+bind a +mleft
+bind d +mright
+
+alias +mfwd "-back;+forward;alias checkfwd +forward"
+alias +mback "-forward;+back;alias checkback +back"
+alias +mleft "-moveright;+moveleft;alias checkleft +moveleft"
+alias +mright "-moveleft;+moveright;alias checkright +moveright"
+alias -mfwd "-forward;checkback;alias checkfwd none"
+alias -mback "-back;checkfwd;alias checkback none"
+alias -mleft "-moveleft;checkright;alias checkleft none"
+alias -mright "-moveright;checkleft;alias checkright none"
+alias checkfwd none
+alias checkback none
+alias checkleft none
+alias checkright none
+alias none ""
+
+
+//CONNECTION SETTINGS
+
+cl_cmdrate 66 
+// Number of command pakets sent to the server per second.
+cl_interp 0 
+// Interpolate x seconds from game (0.02 = 20ms)
+cl_interp_ratio 1 
+// Sets the interpolation amount (final amount is cl_interp_ratio / cl_updaterate).
+cl_lagcompensation 1 
+// Perform server side lag compensation of weapon firing events.
+cl_pred_optimize 2 
+// Optimize for not copying data if didn't receive a network update (1), and also for not repredicting if there were no errors (2)
+cl_smooth 0 
+// If set to 1 attempts to smooth the view after prediction errors.
+cl_smoothtime 0.01 
+// Time over which to smooth the view after prediction errors if cl_smooth is enabled.
+cl_updaterate 66 
+// Number of packets per second you are requesting from the server.
+rate 66000 
+// Max bytes/sec the host can receive data.
+
+
+
+
+//shadows
+mat_shadowstate 0
+r_shadowmaxrendered 0
+r_shadowrendertotexture 0
+r_shadows 0
+
+//facial features
+r_eyes 0
+r_flex 1
+r_lod 2
+r_rootlod 2
+r_teeth 0
+
+//graphical
+cl_detaildist 0
+cl_detailfade 0
+cl_drawmonitors 0
+cl_ejectbrass 0
+cl_jiggle_bone_framerate_cutoff 0 // Turns off jigglebones
+cl_new_impact_effects 0
+cl_show_splashes 0
+//func_break_max_pieces 3
+glow_outline_effect_enable 0 // Cart glow effect.
+lod_transitiondist 0
+mat_antialias 0
+mat_bumpmap 0 
+// Controls bumpmapping. Setting this to 0 on dx9 will cause
+// a strange `shine' effect to appear on all players.
+mat_colcorrection_disableentities 1
+mat_colorcorrection 0
+mat_disable_bloom 1
+mat_disable_fancy_blending 1
+mat_disable_lightwarp 1
+mat_envmapsize 8
+mat_envmaptgasize 0
+mat_filterlightmaps 0
+mat_filtertextures 0
+mat_forceaniso 0
+mat_hdr_level 0
+mat_max_worldmesh_vertices 512
+//mat_monitorgamma 1.7 // Controls brightness, try 1.8 to make it brighter or 2.2 //line 426
+// to get it darker. Only works in fullscreen.
+mat_motion_blur_enabled 0
+mat_parallaxmap 0
+mat_picmip 2 // Higher = more mipmapping. Without `sv_cheats 1', you're looking
+// at a range from -1 to 2, -1 being the best quality, 2 being the
+// worst.
+mat_reducefillrate 1
+mat_reduceparticles 1
+mat_specular 0 // Controls specularity. Setting this to 0 will make ubers
+// non-shiny, and will remove some specular effects from in-game
+// entities which support it. Setting this to 1 on dx8 will
+// result in some strange `fire' textures replacing their
+// appropriate counterparts, especially on medals, and certain
+// hats.
+mat_trilinear 0
+mat_viewportscale 1 // Almost no performance gain from viewport upscaling.
+mat_viewportupscale 1
+mat_wateroverlaysize 1
+mp_decals 1 // `9' is a good value to still see the spread pattern from a
+// scattergun without any real performance loss.
+r_3dsky 0
+r_ambientboost 0
+r_ambientfactor 0
+r_ambientmin 0
+r_avglight 0
+r_cheapwaterend 1
+r_cheapwaterstart 1
+r_decals 1
+r_decalstaticprops 0
+r_decal_cullsize 15
+r_drawdetailprops 0
+
+r_drawmodeldecals 0
+r_drawflecks 0
+r_dynamic 0
+r_flashlightdepthtexture 0
+r_forcewaterleaf 1
+r_lightaverage 0
+r_maxnewsamples 2
+r_maxsampledist 1
+r_propsmaxdist 0
+r_renderoverlayfragment 0
+r_staticprop_lod 4
+r_waterdrawreflection 0
+r_waterdrawrefraction 0
+r_waterforceexpensive 0
+r_waterforcereflectentities 0
+rope_averagelight 0
+rope_collide 0
+rope_rendersolid 0
+rope_shake 0
+rope_smooth 0
+rope_subdiv 0
+rope_wind_dist 0
+tf_particles_disable_weather 1 // Disable weather effects on maps supporting
+// it, for example, setting this to `1'
+// disables rain effects on *_sawmill.
+tracer_extra 0
+violence_ablood 1
+violence_hblood 1
+
+// ----------------------------------------------------------------------------
+// Misc I
+// ----------------------------------------------------------------------------
+in_usekeyboardsampletime 0
+mat_clipz 1 // FX card users should set this to 0
+mat_forcehardwaresync 0
+mat_levelflush 1
+m_rawinput 1 // Turn on raw mouse input. Commented out by default due to
+// silly incompatibility with the Xfire overlay. You should use
+// it if you can!
+mat_vsync 0 // Turn off vsync to avoid nasty I/O latency.
+r_fastzreject -1 // Values >1 enable a fast Z rejection algorithm, to be
+// performed on the GPU (as opposed to on the CPU). The
+// value `-1' autodetects hardware support for this
+// feature, which is safer than forcing it.
+
+// ----------------------------------------------------------------------------
+// Sound
+// ----------------------------------------------------------------------------
+dsp_enhance_stereo 0
+dsp_slow_cpu 1
+snd_async_fullyasync 1 // Having the sound run fully asynchronous has been
+// helpful in the past, as it seems to (for whatever
+// reason) reduce the number of TDRs experienced during
+// gameplay. There's some pretty good information on
+// TDRs (nerds only) here:
+// http://forums.nvidia.com/index.php?showtopic=65161
+snd_pitchquality 0
+snd_spatialize_roundrobin 1
+
+// ----------------------------------------------------------------------------
+// Threading
+// ----------------------------------------------------------------------------
+mat_queue_mode 2 // mat_queue mode is another frequently asked about cvar, it
+// defines the threading method to be used by the material
+// system. It has been unstable to use in the past, but
+// nowadays it's generally okay.
+//
+// Here are the possible values:
+// -2 legacy default
+// -1 default
+// 0 synchronous single thread
+// 1 queued single thread
+// 2 queued multithreaded
+//
+// If you have problems with the value `2', try setting it to
+// `-1'.
+//
+// As an aside, there are quite a few bugs in the demo system
+// that occur when mat_queue_mode is set to a value that is
+// not `-1'. If you intend to do work with the demo system,
+// maybe you should change this.
+
+cl_threaded_bone_setup 0
+cl_threaded_client_leaf_system 0
+r_queued_decals 0
+r_queued_ropes 1
+r_queued_post_processing 1
+r_threaded_client_shadow_manager 0
+r_threaded_particles 0
+r_threaded_renderables 1
+
+
+cl_forcepreload 1 // Force preloading
+
+// FPS Config Section (still use this for GMOD regardless, as I assume it afects vanilla models at bare minimum)
+// ----------------------------------------------------------------------------
+mat_mipmaptextures "1" // texture quality decreases with distance
+mat_bufferprimitives "1"
+mat_compressedtextures "1"
+mat_debugdepthval "0"
+mat_debugdepthvalmax "0"
+mat_hdr_enabled "0"
+mat_use_compressed_hdr_textures "1"
+mat_aaquality "0"
+mat_softwarelighting "0"
+mat_autoexposure_max "0"
+mat_autoexposure_min "0"
+mat_bloomscale "0"
+mat_bloom_scalefactor_scalar "0"
+mat_disable_ps_patch "1"
+mat_fastspecular "1"
+mat_fastnobump "0"
+mat_forcemanagedtextureintohardware "0"
+mat_framebuffercopyoverlaysize "0"
+mat_diffuse "1"
+mat_software_aa_blur_one_pixel_lines "0"
+mat_software_aa_strength "0"
+mat_software_aa_strength_vgui "0"
+mat_software_aa_tap_offset "0"
+mat_alphacoverage "0"
+mat_non_hdr_bloom_scalefactor "0"
+mat_maxframelatency "0"
+snd_mixahead "0.1"
+dsp_volume "1"
+dsp_spatial "40"
+dsp_speaker "50"
+dsp_water "14"
+soundscape_flush "1" // Flushes the server & client side soundscapes
+r_unloadlightmaps "0" // 0 because of alt tabbing causes black walls
+r_dopixelvisibility "0"
+r_PhysPropStaticLighting "0"
+r_occlusion "0" // Activate/deactivate the occlusion system.
+r_worldlights "0" // number of world lights to use per vertex
+r_3dnow "0" // Enable/disable 3DNow code
+r_sse2 "1" // Enable/disable SSE2 code
+r_ropetranslucent "0"
+r_drawbatchdecals "0"
+r_hunkalloclightmaps "0"
+r_maxdlights "0"
+r_maxmodeldecal "0"
+r_minnewsamples "0"
+r_bloomtintg "0"
+r_bloomtintb "0"
+r_bloomtintexponent "0"
+r_bloomtintr "0"
+r_lightcache_zbuffercache "0"
+cl_clearhinthistory "1" // Clear memory of client side hints displayed to the player
+cl_muzzleflash_dlight_1st "0"
+cl_predictweapons "1"
+cl_predict "1"
+tf_playergib "0"
+cl_showhelp "0"
+cl_showpluginmessages "0" // Allow plugins to display messages to you
+cl_rumblescale "0" // Scale sensitivity of rumble effects (0 to 1.0)
+cl_debugrumble "0" // Turn on rumble debugging spew
+cl_ragdoll_collide "0"
+rope_smooth_enlarge "0" // How much to enlarge ropes in screen space for antialiasing effect
+sv_forcepreload "1" // forces preload to help increase performance
+jpeg_quality "100" // jpeg screenshot quality.
+commentary "0" // desired commentary mode state
+flex_smooth "1" // Applies smoothing/decay curve to flex animation controller changes.
+prop_active_gib_limit "0"
+showhitlocation "1"
+gl_clear "0"
+muzzleflash_light "0"
+overview_mode "0" // Sets overview map mode off,small,large: <0|1|2>
+adsp_debug "0"
+mp_usehwmmodels "0"
+mp_usehwmvcds "0"
+
+// -----------------
+// Model Commands Extended
+// -----------------
+
+mat_disablephong "1"
+cl_software_cursor "1"
+m_customaccel_exponent "0"
+m_customaccel_max "0"
+m_customaccel_scale "0"
+m_forward "1"
+m_mousespeed "1"
+nb_shadow_dist "0"
+r_eyegloss "0"
+r_eyemove "0"
+r_eyeshift_x "0"
+r_eyeshift_y "0"
+r_eyeshift_z "0"
+r_eyesize "0"
+blink_duration "0"
+r_ragdoll_pronecheck_distance
+mat_software_aa_quality "0"
+mat_software_aa_edge_threshold "9"
+host_thread_mode "1"
+studio_queue_mode "1"
+rope_smooth_maxalpha "0"
+rope_smooth_maxalphawidth "0"
+rope_smooth_minalpha "0"
+rope_smooth_minwidth "0"
+
+// ---------------
+
+mat_phong 0
+m_filter "0"
+m_customaccel "0"
+m_mouseaccel1 "0"
+m_mouseaccel2 "0"
+ai_expression_optimization "0"
+mat_softwarelighting "1"
+mat_showlowresimage 1
