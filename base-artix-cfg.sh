@@ -11,7 +11,9 @@
 #provides verbosity when errors inevitably occur
 set -x
 
-sudo pacman -Syu zsh wget man gedit git artix-archlinux-support xf86-video-intel nvidia nvidia-settings hwinfo htop
+sudo pacman -Syu zsh wget man gedit git artix-archlinux-support hwinfo htop unzip gnu-free-fonts ttf-liberation
+#uncomment for nvidia proprietary drivers for gv110 drivers or newer
+#sudo pacman -S xf86-video-intel nvidia nvidia-settings
 chsh -s /bin/zsh
 #default editor as vim, persistently
 echo "export EDITOR=/bin/vim" >> /etc/profile
