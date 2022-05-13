@@ -12,7 +12,7 @@
 #01-06/5/22
 #installed the OS and zsh
 #12/5/22 script install zsh
-sudo pacman -Syu zsh wget man gedit git artix-archlinux-support xf86-video-intel nvidia
+sudo pacman -Syu zsh wget man gedit git artix-archlinux-support xf86-video-intel nvidia nvidia-settings hwinfo htop
 chsh -s /bin/zsh
 #default editor as vim, persistently
 echo "export EDITOR=/bin/vim" >> /etc/profile
@@ -40,7 +40,7 @@ echo Section "Device"\n\tIdentifier "Intel Graphics"\n\tDriver "Intel"\nEndSecti
 #32 bit app support (multilib req)
 #sudo pacman -S lib32-nvidia-utils
 sudo mkdir /etc/pacman.d/hooks
-sudo chown $USER /etc/pacman.d/hooks
+sudo chown $USER:$USER /etc/pacman.d/hooks
 sudo touch /etc/pacman.d/hooks/nvidia.hook
 #avoids no upgrade of initramfs after upgrading nvidia drivers, also prevents mkinitcpio from running more than once
 sudo echo [Trigger]\nOperation=Install\nOperation=Remove\nType=Package\nTarget=nvidia\nTarget=linux\n[Action]\nDepends=mkinitcpio\nWhen=PostTransaction\nNeedsTargets\nExec=/bin/sh -c 'while read -r trg; do case $trg in linux) exit 0; esac ; done; /usr/bin/mkinitcpio -P' > /etc/pacman.d/hooks/nvidia.hook 
@@ -49,8 +49,11 @@ sudo chown $USER:$USER -r /etc/pacman.d/hooks #chmod 777 worked for me for all i
 sudo chown $USER:$USER -r /etc/X11
 sudo nvidia-xconfig 
 
-
-
+#two monitor support
+#this is VERY SPECIFIC, this command syntax I use here assumes you have 2 monitors: one is HDMI connected via HDMI-1 and it is on the right (user facing) of
+#a monitor connected by DVI-I-1
+xrandr --output DVI-I-1 --auto --output HDMI-0 --auto --right-of DVI-I-1
+#change primary monitor via display settings GUI of xfce4 (click on applications on the left of the top panel and find "Settings Manager" or "Display")
 #11/5/22
 touch ~/.xinitrc
 #echo [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] >> ~/.xinitrc
