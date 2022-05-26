@@ -10,10 +10,20 @@
 
 #provides verbosity when errors inevitably occur
 set -x
+CARDTYPE= #graphics card manufacturer
+#graphics driver config-dependent var
+numgpu=$(lspci | grep -ci vga)
+([[ numgpu > 1 ]]) && echo "script currently not supported for > 1 graphics card"
+#for some ungodly reason there are exactly 7 spaces prior to the string, piping into sed w/ that expression will remove preceding whitespace
+[[ $(sudo lshw -C display | grep vendor | sed 's/^ *//g') == "vendor: NVIDIA Corporation" ]] && CARDTYPE="NVIDIA"
+#manually configure these variables:
+GITUSER= #username for git config
+GITMAIL= #email for git config
+PKGFILE= #filepath to manually download packages from
+#either get these basic utilities or import from file
 
-sudo pacman -Syu zsh wget man gedit git artix-archlinux-support hwinfo htop unzip gnu-free-fonts ttf-liberation
-#uncomment for nvidia proprietary drivers for gv110 drivers or newer
-#sudo pacman -S xf86-video-intel nvidia nvidia-settings
+if [ -n ${PKGFILE+x} ]; then sudo pacman -S - < $PKGFILE ;else sudo pacman -Syu xfce4 xfce4-goodies zsh vim wget man gedit git artix-archlinux-support hwinfo htop unzip gnu-free-fonts ttf-liberation traceroute pulseaudio-alsa lib32-libpulse lib32-alsa-plugins
+
 chsh -s /bin/zsh
 #default editor as vim, persistently
 echo "export EDITOR=/bin/vim" >> /etc/profile
@@ -27,11 +37,13 @@ cd /opt/
 #this wont work in root or root account
 sudo git clone https://aur.archlinux.org/yay-git.git && chmod 777 -r yay-git && cd yay-git && makepkg -si
 cd $HOME
-
+yay -S ttf-ms-win11
 #install nvidia drivers for NV110/GMXXX series or higher (checked via nvidia driver download page)
 # proprietary drivers, using for xorg (dependency of xfce)
 # default linux kernel
+if [ CARDTYPE == "NVIDIA" ] then
 #creating a "just in case" file as the wiki said making a 20-intel.conf is preferred over xorg.conf
+sudo pacman -S xf86-video-intel nvidia nvidia-settings
 chmod 777 /etc/X11/xorg.conf.d/
 # ^ Leaving this as is due to the fact it needs to be read and accessed by the user. Don't know if it needs to write but not worth the gamble of breaking the whole config.
 sudo touch /etc/X11/xorg.conf.d/20-intel.conf
@@ -48,16 +60,15 @@ sudo echo "[Trigger]\nOperation=Install\nOperation=Remove\nType=Package\nTarget=
 sudo chown $USER:$USER -r /etc/pacman.d/hooks #chmod 777 worked for me for all instances of this the first time
 sudo chown $USER:$USER -r /etc/X11
 sudo nvidia-xconfig 
-
+fi
 #two monitor support
 #this is VERY SPECIFIC, this command syntax I use here assumes you have 2 monitors: one is HDMI connected via HDMI-1 and it is on the right (user facing) of
 #a monitor connected by DVI-I-1. For my setup, the resolution defaults to 1920x1080, though I believe --mode can configure it (See "Multihead" on Arch Wiki)
 xrandr --output DVI-I-1 --auto --output HDMI-0 --auto --right-of DVI-I-1
 #change primary monitor via display settings GUI of xfce4 (click on applications on the left of the top panel and find "Settings Manager" or "Display")
 
-touch ~/.xinitrc
+touch ~/.xinitrc && touch ~/.zshrc && touch ~/.bashrc && touch ~/.vimrc
 echo "[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]]" >> ~/.xinitrc
-sudo pacman -S pulseaudio-alsa lib32-libpulse lib32-alsa-plugins flatpak
 [[ -f $HOME/.asoundrc ]] && rm $HOME/.asoundrc # its not supposed to exist
 cd $HOME
 sudo chmod u+r /etc/pulse/daemon.conf #just in case this permission isn't present
@@ -67,7 +78,10 @@ sudo echo flat-volumes=no >> ~/.pulse/daemon.conf
 #killall xfce4-panel #restart panel
 #xfce4-panel &
 #disown
-#yay gets invalidated if ran as root user
-yay -S noise-suppression-for-voice
+
+#git config
+git config --global user.name $GITUSER
+git config --global user.email $GITMAIL
+git config --global core.editor $EDITOR
 
 
