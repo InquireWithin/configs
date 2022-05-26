@@ -67,7 +67,7 @@ fi
 xrandr --output DVI-I-1 --auto --output HDMI-0 --auto --right-of DVI-I-1
 #change primary monitor via display settings GUI of xfce4 (click on applications on the left of the top panel and find "Settings Manager" or "Display")
 
-touch ~/.xinitrc && touch ~/.zshrc && touch ~/.bashrc && touch ~/.vimrc
+touch ~/.xinitrc && touch ~/.zshrc
 echo "[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]]" >> ~/.xinitrc
 [[ -f $HOME/.asoundrc ]] && rm $HOME/.asoundrc # its not supposed to exist
 cd $HOME
@@ -79,9 +79,35 @@ sudo echo flat-volumes=no >> ~/.pulse/daemon.conf
 #xfce4-panel &
 #disown
 
+#I hate tabs b/c it makes python an impossibility
+tabs 4 #tabs should now be set to 4 spaces
+
 #git config
 git config --global user.name $GITUSER
 git config --global user.email $GITMAIL
 git config --global core.editor $EDITOR
+
+#zshrc
+#requires zsh-syntax-highlighting from AUR
+[[ -d /usr/share/zsh/plugins/zsh-syntax-highlighting ]] && echo "source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ~/.zshrc
+echo "autoload -U colors && colors" >> ~/.zshrc
+echo 'PS1="%B%{$fg[green]%}[%{$fg[blue]%}%n%{$fg[magenta]%}@%{$fg[red]%}%M %{$fg[magenta]%}%~%{$fg[green]%}]%{$reset_color%}$%b "' >> ~/.zshrc
+
+#vimrc
+#echo "set mouse=a" >> ~/.vimrc #not needed unless mouse support is disabled by default and/or you want mouse support. This depends on terminal, however.
+echo "set tabstop=4" >> ~/.vimrc #vim has its own settings, so of course I want \t = to 4 spaces here as well
+
+#bashrc
+
+
+
+
+
+
+
+
+
+
+
 
 
