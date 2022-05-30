@@ -28,11 +28,10 @@ if [ -n ${PKGFILE+x} ]; then sudo pacman -S --noconfirm - < $PKGFILE ;else sudo 
 if [ $USEZSH=="TRUE" ] then
 sudo pacman -S zsh
 chsh -s /bin/zsh
-touch ~./zshrc
 #zshrc
 yay -S zsh-syntax-highlighting #replace this with the git process so its automated
 !([[ -d /bin/curl ]]) && sudo pacman -S --noconfirm curl
-#curl https://github.com/InquireWithin/config
+curl https://github.com/InquireWithin/configs/tree/main/dotfiles/.zshrc >> ~/.zshrc
 fi
 if [ $USEXFCE4=="TRUE" ] then
 sudo pacman -S xfce4 xfce4-goodies
@@ -97,16 +96,11 @@ git config --global core.editor $EDITOR
 git config --global init.defaultBranch master
 
 #vimrc
-touch ~/.vimrc
-echo "set mouse=a" >> ~/.vimrc #not needed unless mouse support is disabled by default and/or you want mouse support. This depends on terminal, however.
-#for all files except makefiles and auto-indents (particularly in C/C++), use tab as 4 spaces wide and insert 4 spaces.
-echo "if has(\"autocmd\")\n    autocmd FileType make set tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab\nendif\nset tabstop=4\nset shiftwidth=4\nset softtabstop=4\nset expandtab">>~/.vimrc
-
+curl https://github.com/InquireWithin/configs/tree/main/dotfiles/.vimrc > ~/.vimrc
 #bashrc
-
+curl https://github.com/InquireWithin/configs/tree/main/dotfiles/.bashrc > ~/.bashrc
 
 #hosts file domain blocking (decreases the urgency of acquiring an ad-blocker and helps for browsers with limited support for ad-blocking extensions or integration)
-!([[ -d /usr/bin/curl ]]) && pacman -S --noconfirm curl
 sudo chmod 777 /etc/hosts
 curl https://raw.githubusercontent.com/InquireWithin/resources/main/ublock_adblock_server_filter.txt >> /etc/hosts
 sudo chmod 644 /etc/hosts
