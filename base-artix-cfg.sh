@@ -30,10 +30,9 @@ sudo pacman -S zsh
 chsh -s /bin/zsh
 touch ~./zshrc
 #zshrc
-#requires zsh-syntax-highlighting from AUR
-[[ -d /usr/share/zsh/plugins/zsh-syntax-highlighting ]] && echo "source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ~/.zshrc
-echo "autoload -U colors && colors" >> ~/.zshrc
-echo 'PS1="%B%{$fg[green]%}[%{$fg[blue]%}%n%{$fg[magenta]%}@%{$fg[red]%}%M %{$fg[magenta]%}%~%{$fg[green]%}]%{$reset_color%}$%b "' >> ~/.zshrc
+yay -S zsh-syntax-highlighting #replace this with the git process so its automated
+!([[ -d /bin/curl ]]) && sudo pacman -S --noconfirm curl
+#curl https://github.com/InquireWithin/config
 fi
 if [ $USEXFCE4=="TRUE" ] then
 sudo pacman -S xfce4 xfce4-goodies

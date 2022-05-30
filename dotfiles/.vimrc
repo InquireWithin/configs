@@ -20,11 +20,12 @@ set numberwidth=2
 "mouse support
 set mouse=a
 
-
-
-
-
-
+"allow movement as if every line is its own line (even when it is not). Useful for long lines of code or sentences.
+map j gj
+map k gk
+map $ g$
+map 0 g0
+"the best solution for above is to use gq on a line for text wrapping. These maps are here regardless just in case I forget about this.
 
 
 
