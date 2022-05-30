@@ -1,6 +1,7 @@
 HISTFILE=~/.histfile
 HISTSIZE=25000
 SAVEHIST=5000
+alias cp='cp -iv'
 zstyle :compinstall filename '/home/self/.zshrc'
 autoload -Uz compinit # load completioninit module
 zstyle ':completion:*' menu select # menu style tab completion
@@ -14,30 +15,33 @@ source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zs
 #implementation of vi mode in zsh
 bindkey -v
 export KEYTIMEOUT=1
-#cursor changes depending on vi mode
+#CHANGE CURSOR BASED ON VI MODE
 function zle-keymap-select {
-    if [[ ${KEYMAP} == vicmd ]] || [[ $1 = 'block' ]]; then echo -ne '\e[1 q'
-    elif [[ ${KEYMAP} == main ]] || [[ ${KEYMAP} == viins ]] || [[ ${KEYMAP} == '' ]] || [[ $1 = 'line' ]]; then echo -ne '\e[5 q'
-    fi
+  if [[ ${KEYMAP} == vicmd ]] ||
+     [[ $1 = 'block' ]]; then
+    echo -ne '\e[1 q'
+elif [[ ${KEYMAP} == main ]] ||
+      [[ ${KEYMAP} == viins ]] ||
+      [[ ${KEYMAP} == '' ]] ||
+      [[ $1 = 'line' ]]; then
+    echo -ne '\e[5 q'
+  fi
 }
 zle -N zle-keymap-select
 zle-line-init() {
     zle -K viins
     echo -ne "\e[5 q"
 }
-zle -N zle-line-init() {
-# block cursor defaults
+zle -N zle-line-init
 echo -ne '\e[1 q'
 preexec() { echo -ne '\e[1 q' ;}
 
-#vim keys in the tab menu
+#vim keys in autocomplete menu
 bindkey -M menuselect 'h' vi-backward-char
 bindkey -M menuselect 'k' vi-up-line-or-history
 bindkey -M menuselect 'l' vi-forward-char
 bindkey -M menuselect 'j' vi-down-line-or-history
-bindkey -M '^?' backward-delete-char
+bindkey -v '^?' backward-delete-char
 
-#edit line in vim w/ ctrl + e
-autoload edit-command-line; zle -N edit-command-line
-bindkey '^e' edit-command-line
+
 
