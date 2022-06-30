@@ -4,60 +4,62 @@
 #Init service is openrc, first installed this iteration of the os in the first week of may 2022
 #Desktop env: xfce4 (startxfce4 to launch it manually)
 #THIS WAS WRITTEN BEFORE I KNEW THERE WAS AN AUTOINSTALLER FOR XFCE ON THE ARTIX WIKI
-#!/bin/sh
-#sudo su
+#!/bin/bash
 
 
 #provides verbosity when errors inevitably occur
 set -x
-CARDTYPE= #graphics card manufacturer
-#graphics driver config-dependent var
-numgpu=$(lspci | grep -ci vga)
-([[ numgpu > 1 ]]) && echo "script currently not supported for > 1 graphics card"
+CARDTYPE="" #graphics card manufacturer
+#graphics driver config-dependent 
+[[ $(lspci | grep -ci vga) > 1 ]] && echo "script currently not supported for > 1 graphics card"
 #for some ungodly reason there are exactly 7 spaces prior to the string, piping into sed w/ that expression will remove preceding whitespace
 [[ $(sudo lshw -C display | grep vendor | sed 's/^ *//g') == "vendor: NVIDIA Corporation" ]] && CARDTYPE="NVIDIA"
 #manually configure these variables:
-GITUSER= #username for git config
-GITMAIL= #email for git config
+GITUSER="" #username for git config
+GITMAIL="" #email for git config
+DEFAULTBRANCHNAME="master"
 USEXFCE4="TRUE" #set up for xfce4 desktop environment
 USEZSH="TRUE" #flags whether zsh should be installed and used over bash as a default shell
-PKGFILE= #filepath to manually download packages from
-#either get these basic utilities or import from file
+PKGFILE="" #filepath to manually download packages from
 
-#this script currently only supports intel cpu's. it can be ran w/o an nvidia gpu but no graphical config will be made. It can be ran w/o setting usexfce4 TRUE, but no DE config will be made.
+#this script currently only supports intel cpu's (in terms of graphics). it can be ran w/o an nvidia gpu but no graphical config will be made. It can be ran w/o setting usexfce4 TRUE, but no DE config will be made.
+#uses pulseaudio by default
+#the AUR helper is yay by default
+#an internet connection is assumed and required. I might add something later on that will help do this if none is found
+#Finally, it's also highly advised to be on a user account you've already created. Maybe I'll add this in the script at some point. This user should have sudo privileges.
 
-if [ -n ${PKGFILE+x} ]; then sudo pacman -S --noconfirm - < $PKGFILE 
+#Will install whatever packages are specified in the filepath in $PKGFILE
+[[ ! -n ${PKGFILE+x} ]] && sudo pacman -S --noconfirm - < $PKGFILE 
 #recommended but optional packages
-#sudo pacman -Syu --noconfirm  wget gedit hwinfo htop unzip gnu-free-fonts ttf-liberation traceroute 
-!([[ -d /bin/curl ]]) && sudo pacman -S --noconfirm curl man vim artix-archlinux-support git pulseaudio-alsa lib32-libpulse lib32-alsa-plugins
+#sudo pacman -Syu --noconfirm wget gedit hwinfo htop unzip traceroute neomutt neovim shutter
+#essentials
+sudo pacman -Syu --noconfirm curl man vim artix-archlinux-support git pulseaudio pulseaudio-alsa lib32-libpulse lib32-alsa-plugins zathura mpv pavucontrol gnu-free-fonts ttf-liberation
+
+#yay installation b/c eventually I'll need an AUR exclusive package. this wont work in root or root account
+cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && chmod 777 -r yay-git && cd yay-git && makepkg -si && cd $HOME
+#yay -S --noconfirm ttf-ms-win11 #if you ever plan to use steam, uncomment
+
 if [ $USEZSH=="TRUE" ] then
-sudo pacman -S zsh
+sudo pacman -S --noconfirm zsh
 chsh -s /bin/zsh
-#zshrc
-yay -S zsh-syntax-highlighting #replace this with the git process so its automated
+yay -S --noconfirm zsh-syntax-highlighting
 curl https://github.com/InquireWithin/configs/tree/main/dotfiles/.zshrc >> ~/.zshrc
 fi
-if [ $USEXFCE4=="TRUE" ] then
-sudo pacman -S xfce4 xfce4-goodies
-fi
+
+[[ $USEXFCE4=="TRUE" ]] && sudo pacman --noconfirm -S xfce4 xfce4-goodies
+
 #default editor as vim, persistently
 echo "export $EDITOR=/bin/vim" >> /etc/profile
 sudo chmod 777 /etc/pacman.conf
-#put compatibility for extra, mutilib, and community here (see software.txt)
+#Integrate compatibility for extra, mutilib, and community repos here 
 sudo echo "[extra]\nInclude = /etc/pacman.d/mirrorlist-arch\n\n[community]\nInclude=/etc/pacman.d/mirrorlist-arch\n\n[multilib]\nInclude=/etc/pacman.d/mirrorlist-arch" >> /etc/pacman.conf
 pacman-key --populate archlinux
-#yay installation b/c eventually I'll need an AUR exclusive package
-cd /opt/
-#this wont work in root or root account
-sudo git clone https://aur.archlinux.org/yay-git.git && chmod 777 -r yay-git && cd yay-git && makepkg -si
-cd $HOME
-#yay -S ttf-ms-win11 #if you ever plan to use steam, uncomment
 
 #install nvidia drivers for NV110/GMXXX series or higher (checked via nvidia driver download page)
 # proprietary drivers, using for xorg (dependency of xfce)
 # default linux kernel
 if [ $CARDTYPE == "NVIDIA" ] then
-#creating a "just in case" file as the wiki said making a 20-intel.conf is preferred over xorg.conf
+#creating a "just in case" file as the wiki suggested making a 20-intel.conf over an xorg.conf (likely b/c pacman has an affinity for breaking an xorg.conf)
 sudo pacman -S --noconfirm xf86-video-intel nvidia nvidia-settings
 [[ $USEXFCE4=="TRUE" ]] && chmod 777 /etc/X11/xorg.conf.d/ && sudo touch "/etc/X11/xorg.conf.d/20-intel.conf"
 sudo chmod 777 /etc/X11/xorg.conf.d/20-intel.conf && echo "Section \"Device\"\n\tIdentifier \"Intel Graphics\"\n\tDriver \"Intel\"\nEndSection" >> /etc/X11/xorg.conf.d/20-intel.conf
@@ -66,7 +68,7 @@ sudo chmod 777 /etc/X11/xorg.conf.d/20-intel.conf && echo "Section \"Device\"\n\
 #sudo pacman -S lib32-nvidia-utils #32-bit app support (multilib req, should already be configured)
 sudo mkdir /etc/pacman.d/hooks
 sudo chown $USER:$USER /etc/pacman.d/hooks #chmod 777 worked for me for all instances of this the first time
-touch /etc/pacman.d/hooks/nvidia.hook && echo "[Trigger]\nOperation=Install\nOperation=Remove\nType=Package\nTarget=nvidia\nTarget=linux\n[Action]\nDepends=mkinitcpio\nWhen=PostTransaction\nNeedsTargets\nExec=/bin/sh -c 'while read -r trg; do case $trg in linux) exit 0; esac ; done; /usr/bin/mkinitcpio -P'" > /etc/pacman.d/hooks/nvidia.hook 
+touch /etc/pacman.d/hooks/nvidia.hook && echo "[Trigger]\nOperation=Install\nOperation=Remove\nType=Package\nTarget=nvidia\nTarget=linux\n[Action]\nDepends=mkinitcpio\nWhen=PostTransaction\nNeedsTargets\nExec=/bin/sh -c 'while read -r trg; do case \$trg in linux) exit 0; esac ; done; /usr/bin/mkinitcpio -P'" > /etc/pacman.d/hooks/nvidia.hook 
 #above logic avoids no upgrade of initramfs after upgrading nvidia drivers, also prevents mkinitcpio from running more than once
 sudo chown $USER:$USER -r /etc/pacman.d/hooks 
 [[ $USEXFCE4=="TRUE" ]] && sudo chown $USER:$USER -r /etc/X11
@@ -94,7 +96,7 @@ git config --global user.name $GITUSER
 git config --global user.email $GITMAIL
 git config --global core.editor $EDITOR
 #personal preference, I still have repos that use this, they screwed people over when they changed the default.
-#git config --global init.defaultBranch master
+[[ ! -n $DEFAULTBRANCHNAME ]] && git config --global init.defaultBranch $DEFAULTBRANCHNAME
 
 #vimrc
 curl https://github.com/InquireWithin/configs/tree/main/dotfiles/.vimrc > ~/.vimrc
@@ -105,7 +107,11 @@ curl https://github.com/InquireWithin/configs/tree/main/dotfiles/.bashrc > ~/.ba
 sudo chmod 777 /etc/hosts
 curl https://github.com/InquireWithin/resources/tree/main/LF/LF_extended_telemetry_list.txt >> /etc/hosts
 sudo chmod 644 /etc/hosts
+#remove any orphaned packages
+sudo pacman --noconfirm -R $(pacman -Qtdq)
 
+#launch the DE
+exec startx
 
 
 
