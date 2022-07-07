@@ -1,9 +1,50 @@
 HISTFILE=~/.histfile
 HISTSIZE=25000
 SAVEHIST=5000
+HISTIGNORE='*sudo -S*'
+
+#aliases
+alias icat='icecat'
 alias cp='cp -iv'
-replace 'self' with your user account name
-zstyle :compinstall filename "/home/$USER/.zshrc"
+alias wc='wc -w'
+alias pm='sudo pacman'
+alias pms='sudo pacman -S'
+alias pmsn='sudo pacman -S --noconfirm'
+alias pmsu='sudo pacman -Syu'
+alias sl='ls'
+alias vzsh='vim ~/.zshrc'
+alias vbash='vim ~/.bashrc'
+
+#DE-specific aliases
+alias sx4='startxfce4'
+#software-specific aliases
+alias sigd='signal-desktop'
+
+
+#funcs for aliases
+
+#'mvd' command will now automatically create a directory when moving file(s) to a target dir that does not exist
+function mvd()
+{ #include a slash at the end of a directory
+    dir="$_"
+    tmp="$_";tmp="${tmp: -1}"
+    [ -d "$dir" ] || mkdir -p "$dir"
+    [ -d "$dir" ] && echo "created directory $dir"
+    mv "$@"
+}
+
+#'cpd' command will now automatically copy files to the name and path of the last argument and create that dir if it doesn't exist, works like mvd
+function cpd() 
+{
+    dir="$_"
+    tmp="$_";tmp="${tmp: -1}"
+    [ -d "$dir" ] || mkdir -p "$dir"
+    [ -d "$dir" ] && echo "created directory $dir"
+    cp "$@"
+}
+
+#tab completion
+zstyle :compinstall filename "$HOME/.zshrc"
 autoload -Uz compinit # load completioninit module
 zstyle ':completion:*' menu select # menu style tab completion
 zmodload zsh/complist
