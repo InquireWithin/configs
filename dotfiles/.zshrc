@@ -2,8 +2,8 @@ HISTFILE=~/.histfile
 HISTSIZE=25000
 SAVEHIST=5000
 alias cp='cp -iv'
-#replace 'self' with your user account name
-#zstyle :compinstall filename '/home/self/.zshrc'
+replace 'self' with your user account name
+zstyle :compinstall filename "/home/$USER/.zshrc"
 autoload -Uz compinit # load completioninit module
 zstyle ':completion:*' menu select # menu style tab completion
 zmodload zsh/complist
