@@ -44,11 +44,11 @@ export HISTIGNORE='*sudo -S*' #done so that pw cant be reaped from shell history
 #recommended but optional packages
 #sudo pacman -Syu --noconfirm wget gedit hwinfo htop unzip traceroute neomutt neovim shutter btrfs-progs dosfstools dos2unix transmission-cli groff scim
 #essentials
-sudo pacman -Syu --noconfirm curl man vim git pulseaudio pulseaudio-alsa lib32-libpulse lib32-alsa-plugins zathura mpv pavucontrol gnu-free-fonts ttf-liberation
+sudo pacman -Syu --noconfirm gcc curl man go make fakeroot vim git pulseaudio pulseaudio-alsa lib32-libpulse lib32-alsa-plugins zathura mpv pavucontrol gnu-free-fonts ttf-liberation
 
 #yay installation b/c eventually I'll need an AUR exclusive package. this wont work in root user
-cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chmod 777 -r yay-git && cd yay-git && makepkg -si && cd $HOME
-#yay -S --noconfirm ttf-ms-win11 #if you ever plan to use steam, uncomment
+cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chmod 777 yay-git -R && cd yay-git && makepkg -si && cd $HOME
+
 
 #Ensuring XDG directory specifcation defaults are met. Mostly redundant, however.
 declare -A xdgarr=(["XDG_DATA_HOME"]='$HOME/.local/share' ["XDG_CONFIG_HOME"]='$HOME/.config' ["XDG_CACHE_HOME"]='$HOME/.cache' ["XDG_DATA_DIRS"]='usr/local/share/:/usr/share/' ["XDG_CONFIG_DIRS"]='/etc/xdg')
@@ -67,13 +67,15 @@ if [ $USEZSH = "TRUE" ] then
 fi
 [[ $USEXFCE4 = "TRUE" ]] && sudo pacman --noconfirm -S xfce4 xfce4-goodies
 #default editor as vim, persistently, except if nvim exists which would be used instead.
-[[ -f /usr/bin/nvim ]] && sudo echo "EDITOR=/usr/bin/nvim" >> /etc/environment || sudo echo "EDITOR=/usr/bin/vim" >> /etc/environment
+[[ -f /usr/bin/nvim ]] && sudo echo "EDITOR=/usr/bin/nvim" >> /etc/profile || sudo echo "EDITOR=/usr/bin/vim" >> /etc/profile
 sudo chmod 777 /etc/pacman.conf
-echo "[lib32]\nInclude = /etc/pacman.d/mirrorlist\n[universe]\nServer = https://universe.artixlinux.org/$arch\nServer = https://mirror1.artixlinux.org/universe/$arch\nServer = https://mirror.pascalpuffke.de/artix-universe/$arch\nServer = https://artixlinux.qontinuum.space/artixlinux/universe/os/$arch\nServer = https://mirror1.cl.netactuate.com/artix/universe/$arch\nServer = https://ftp.crifo.org/artix-universe/" >> /etc/pacman.conf
+printf "[lib32]\nInclude = /etc/pacman.d/mirrorlist\n[universe]\nServer = https://universe.artixlinux.org/\$arch\nServer = https://mirror1.artixlinux.org/universe/\$arch\nServer = https://mirror.pascalpuffke.de/artix-universe/\$arch\nServer = https://artixlinux.qontinuum.space/artixlinux/universe/os/\$arch\nServer = https://mirror1.cl.netactuate.com/artix/universe/\$arch\nServer = https://ftp.crifo.org/artix-universe/\0" >> /etc/pacman.conf
 #Integrate compatibility for extra, mutilib, and community repos here, if enabled
 sudo pacman -Sy --noconfirm archlinux-keyring artix-archlinux-support #artix-archlinux-support comes from universe now, which should be enabled
 sudo pacman-key --populate archlinux #only thing that was done the first go around was this line
-[[ $USEARCHREPOS = 'TRUE' ]] && echo "[extra]\nInclude = /etc/pacman.d/mirrorlist-arch\n\n[community]\nInclude=/etc/pacman.d/mirrorlist-arch\n\n[multilib]\nInclude=/etc/pacman.d/mirrorlist-arch" >> /etc/pacman.conf
+#NOTE: do not manually create a mirrorlist-arch
+[[ $USEARCHREPOS = 'TRUE' ]] && printf "[extra]\nInclude = /etc/pacman.d/mirrorlist-arch\n\n[community]\nInclude=/etc/pacman.d/mirrorlist-arch\n\n[multilib]\nInclude=/etc/pacman.d/mirrorlist-arch\0" >> /etc/pacman.conf
+sudo pacman -Sy
 sudo chmod 644 /etc/pacman.conf
 
 #install nvidia drivers for NV110/GMXXX series or higher (checked via nvidia driver download page)
@@ -83,13 +85,13 @@ if [ $CARDTYPE = "NVIDIA" ] then
     #creating a "just in case" file as the wiki suggested making a 20-intel.conf over an xorg.conf (likely b/c pacman has an affinity for breaking an xorg.conf)
     sudo pacman -S --noconfirm xf86-video-intel nvidia nvidia-settings
     chmod 777 /etc/X11/xorg.conf.d/ && sudo touch "/etc/X11/xorg.conf.d/20-intel.conf"
-    sudo chmod 777 /etc/X11/xorg.conf.d/20-intel.conf && echo "Section \"Device\"\n\tIdentifier \"Intel Graphics\"\n\tDriver \"Intel\"\nEndSection" >> /etc/X11/xorg.conf.d/20-intel.conf
+    sudo chmod 777 /etc/X11/xorg.conf.d/20-intel.conf && printf "Section \"Device\"\n\tIdentifier \"Intel Graphics\"\n\tDriver \"Intel\"\nEndSection\0" >> /etc/X11/xorg.conf.d/20-intel.conf
     # ^ Leaving this as is due to the fact it needs to be read and accessed by the user. Don't know if it needs to write but not worth the gamble of breaking the whole config.
 
     #sudo pacman -S lib32-nvidia-utils #32-bit app support (multilib req, should already be configured)
     sudo mkdir /etc/pacman.d/hooks
     sudo chown $USER /etc/pacman.d/hooks #chmod 777 worked for me for all instances of this the first time
-    touch /etc/pacman.d/hooks/nvidia.hook && echo "[Trigger]\nOperation=Install\nOperation=Remove\nType=Package\nTarget=nvidia\nTarget=linux\n[Action]\nDepends=mkinitcpio\nWhen=PostTransaction\nNeedsTargets\nExec=/bin/sh -c 'while read -r trg; do case \$trg in linux) exit 0; esac ; done; /usr/bin/mkinitcpio -P'" > /etc/pacman.d/hooks/nvidia.hook 
+    touch /etc/pacman.d/hooks/nvidia.hook && printf "[Trigger]\nOperation=Install\nOperation=Remove\nType=Package\nTarget=nvidia\nTarget=linux\n[Action]\nDepends=mkinitcpio\nWhen=PostTransaction\nNeedsTargets\nExec=/bin/sh -c 'while read -r trg; do case \$trg in linux) exit 0; esac ; done; /usr/bin/mkinitcpio -P'\0" > /etc/pacman.d/hooks/nvidia.hook 
     #above logic avoids no upgrade of initramfs after upgrading nvidia drivers, also prevents mkinitcpio from running more than once
     sudo chown $USER -r /etc/pacman.d/hooks 
     sudo chown $USER -r /etc/X11
