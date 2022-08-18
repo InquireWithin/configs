@@ -42,9 +42,9 @@ export HISTIGNORE='*sudo -S*' #done so that pw cant be reaped from shell history
 #Will install whatever packages are specified in the filepath in $PKGFILE assuming the variable isnt set to an empty string (null)
 [[ ! -n ${PKGFILE+x} ]] && sudo pacman -S --noconfirm - < $PKGFILE 
 #recommended but optional packages
-#sudo pacman -Syu --noconfirm wget gedit hwinfo htop unzip traceroute neomutt neovim shutter btrfs-progs dosfstools dos2unix transmission-cli groff scim
+#sudo pacman -Syu --noconfirm wget gedit hwinfo htop unzip traceroute neomutt neovim shutter btrfs-progs dosfstools dos2unix transmission-cli groff scim zathura mpv
 #essentials
-sudo pacman -Syu --noconfirm gcc curl man go make fakeroot vim git pulseaudio pulseaudio-alsa lib32-libpulse lib32-alsa-plugins zathura mpv pavucontrol gnu-free-fonts ttf-liberation
+sudo pacman -Syu --noconfirm gcc patch curl man go make fakeroot vim git pulseaudio pulseaudio-alsa lib32-libpulse lib32-alsa-plugins pavucontrol gnu-free-fonts ttf-liberation p7zip
 
 #yay installation b/c eventually I'll need an AUR exclusive package. this wont work in root user
 cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chmod 777 yay-git -R && cd yay-git && makepkg -si && cd $HOME
@@ -84,27 +84,27 @@ sudo chmod 644 /etc/pacman.conf
 if [ $CARDTYPE = "NVIDIA" ] then
     #creating a "just in case" file as the wiki suggested making a 20-intel.conf over an xorg.conf (likely b/c pacman has an affinity for breaking an xorg.conf)
     sudo pacman -S --noconfirm xf86-video-intel nvidia nvidia-settings
-    chmod 777 /etc/X11/xorg.conf.d/ && sudo touch "/etc/X11/xorg.conf.d/20-intel.conf"
-    sudo chmod 777 /etc/X11/xorg.conf.d/20-intel.conf && printf "Section \"Device\"\n\tIdentifier \"Intel Graphics\"\n\tDriver \"Intel\"\nEndSection\0" >> /etc/X11/xorg.conf.d/20-intel.conf
+    sudo chmod 777 /etc/X11/xorg.conf.d/
+    sudo chmod 777 /etc/X11/xorg.conf.d/20-intel.conf && printf "Section \"Device\"\n\tIdentifier \"Intel Graphics\"\n\tDriver \"Intel\"\nEndSection\0" > /etc/X11/xorg.conf.d/20-intel.conf
     # ^ Leaving this as is due to the fact it needs to be read and accessed by the user. Don't know if it needs to write but not worth the gamble of breaking the whole config.
 
     #sudo pacman -S lib32-nvidia-utils #32-bit app support (multilib req, should already be configured)
     sudo mkdir /etc/pacman.d/hooks
     sudo chown $USER /etc/pacman.d/hooks #chmod 777 worked for me for all instances of this the first time
-    touch /etc/pacman.d/hooks/nvidia.hook && printf "[Trigger]\nOperation=Install\nOperation=Remove\nType=Package\nTarget=nvidia\nTarget=linux\n[Action]\nDepends=mkinitcpio\nWhen=PostTransaction\nNeedsTargets\nExec=/bin/sh -c 'while read -r trg; do case \$trg in linux) exit 0; esac ; done; /usr/bin/mkinitcpio -P'\0" > /etc/pacman.d/hooks/nvidia.hook 
+    printf "[Trigger]\nOperation=Install\nOperation=Remove\nType=Package\nTarget=nvidia\nTarget=linux\n[Action]\nDepends=mkinitcpio\nWhen=PostTransaction\nNeedsTargets\nExec=/bin/sh -c 'while read -r trg; do case \$trg in linux) exit 0; esac ; done; /usr/bin/mkinitcpio -P'\0" > /etc/pacman.d/hooks/nvidia.hook 
     #above logic avoids no upgrade of initramfs after upgrading nvidia drivers, also prevents mkinitcpio from running more than once
-    sudo chown $USER -r /etc/pacman.d/hooks 
-    sudo chown $USER -r /etc/X11
-    sudo nvidia-xconfig 
+    sudo chown $USER -R /etc/pacman.d/hooks 
+    sudo chown $USER -R /etc/X11
+    sudo nvidia-xconfig
 fi
 
 #two monitor support
 #this is VERY SPECIFIC, this command syntax I use here assumes you have 2 monitors: one is HDMI connected via HDMI-1 and it is on the right (user facing) of
 #a monitor connected by DVI-I-1. For my setup, the resolution defaults to 1920x1080, though I believe --mode can configure it (See "Multihead" on Arch Wiki)
-#xrandr --output DVI-I-1 --auto --output HDMI-0 --auto --right-of DVI-I-1
+#xrandr --output DVI-I-1 --auto --output HDMI-1 --auto --right-of DVI-I-1
 #change primary monitor via display settings GUI of xfce (click on applications on the left of the top panel and find "Settings Manager" or "Display")
 cd $HOME
-[[ $USEXFCE4 = "TRUE" ]] && echo '[[ ! $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startx' >> .bash_profile
+echo '[[ ! $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startx' >> .bash_profile
 [[ -f .asoundrc ]] && rm .asoundrc # its not supposed to exist
 #copy settings from the system's configuration into a user-specific config (changes made in the file inside home (~) will only affect the current user and are not system wide
 mkdir .pulse
@@ -115,7 +115,6 @@ tabs 4
 git config --global user.name $GITUSER
 git config --global user.email $GITMAIL
 git config --global core.editor $EDITOR
-#personal preference, I still have repos that use this, they screwed people over when they changed the default.
 [[ ! -n $DEFAULTBRANCHNAME ]] && git config --global init.defaultBranch $DEFAULTBRANCHNAME
 
 #vimrc
