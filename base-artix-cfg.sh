@@ -75,7 +75,7 @@ sudo pacman -Sy --noconfirm archlinux-keyring artix-archlinux-support #artix-arc
 sudo pacman-key --populate archlinux #only thing that was done the first go around was this line
 #NOTE: do not manually create a mirrorlist-arch
 [[ $USEARCHREPOS = 'TRUE' ]] && printf "[extra]\nInclude = /etc/pacman.d/mirrorlist-arch\n\n[community]\nInclude=/etc/pacman.d/mirrorlist-arch\n\n[multilib]\nInclude=/etc/pacman.d/mirrorlist-arch\0" >> /etc/pacman.conf
-sudo pacman -Sy
+sudo pacman -Sy --noconfirm
 sudo chmod 644 /etc/pacman.conf
 
 #install nvidia drivers for NV110/GMXXX series or higher (checked via nvidia driver download page)
@@ -104,7 +104,7 @@ fi
 #xrandr --output DVI-I-1 --auto --output HDMI-1 --auto --right-of DVI-I-1
 #change primary monitor via display settings GUI of xfce (click on applications on the left of the top panel and find "Settings Manager" or "Display")
 cd $HOME
-echo '[[ ! $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startx' >> .bash_profile
+#echo '[[ ! $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startx' >> .bash_profile
 [[ -f .asoundrc ]] && rm .asoundrc # its not supposed to exist
 #copy settings from the system's configuration into a user-specific config (changes made in the file inside home (~) will only affect the current user and are not system wide
 mkdir .pulse
