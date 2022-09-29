@@ -29,8 +29,6 @@ CARDTYPE="" #graphics card manufacturer.
 #don't run as root
 [ "$(id -u)" -eq 0 ] && echo "This script should not be ran as root, as most of it will break. Consider creating or logging into a user account that can use sudo before running." && exit 1
 
-#for some ungodly reason there are exactly 7 spaces prior to the string, piping into sed w/ that expression will remove preceding whitespace.
-[[ $(sudo lshw -C display | grep vendor | sed 's/^ *//g') == "vendor: NVIDIA Corporation" ]] && CARDTYPE="NVIDIA"
 #graphics driver config-dependent. Fix the pipe into grep, it's bloat.
 [[ $(lspci | grep -ci vga) > 1 ]] && echo "ERROR: Script currently not supported for > 1 graphics card"
 export HISTIGNORE='*sudo -S*' #done so that pw cant be reaped from shell history.
@@ -44,7 +42,11 @@ export HISTIGNORE='*sudo -S*' #done so that pw cant be reaped from shell history
 #recommended but optional packages
 #sudo pacman -Syu --noconfirm wget gedit hwinfo htop unzip traceroute neomutt neovim shutter btrfs-progs dosfstools dos2unix transmission-cli groff scim zathura mpv
 #essentials
-sudo pacman -Syu --noconfirm gcc patch curl man go make fakeroot vim git pulseaudio pulseaudio-alsa lib32-libpulse lib32-alsa-plugins pavucontrol gnu-free-fonts ttf-liberation p7zip
+sudo pacman -Syu --noconfirm gcc patch curl man go make fakeroot vim git pulseaudio pulseaudio-alsa lib32-libpulse lib32-alsa-plugins pavucontrol gnu-free-fonts ttf-liberation p7zip lshw
+
+
+#for some ungodly reason there are exactly 7 spaces prior to the string, piping into sed w/ that expression will remove preceding whitespace.
+[[ $(sudo lshw -C display | grep vendor | sed 's/^ *//g') == "vendor: NVIDIA Corporation" ]] && CARDTYPE="NVIDIA"
 
 #yay installation b/c eventually I'll need an AUR exclusive package. this wont work in root user
 cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chmod 777 yay-git -R && cd yay-git && makepkg -si && cd $HOME
